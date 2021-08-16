@@ -1,0 +1,109 @@
+@tailwind base;
+/* Write your global styles here, in PostCSS syntax */
+
+:root {
+	--black: #010101;
+	--whitey: #fefefe;
+	--dark-blue: #1c2b48;
+	--grey: #242e34;
+	--light-grey: #f4f6fa;
+
+	--primary: var(--grey);
+	--secondary: var(--light-grey);
+
+	--font-big: clamp(18px, 3vw, 30px);
+	--font-large: clamp(17px, 2.5vw, 23px);
+	--font-medium: clamp(15px, 2vw, 22px);
+	--font-normal: clamp(13px, 1.5vw, 16px);
+	--font-small: clamp(10px, 1vw, 14px);
+	--font-very-small: clamp(8px, 0.9vw, 11px);
+}
+
+html {
+	font-size: 65.25%;
+	font-size: 62.5%;
+}
+
+body {
+	font-size: var(--font-normal);
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+	position: relative;
+	width: 100%;
+	min-height: 100vh;
+
+	font-weight: 400;
+	font-style: normal;
+
+	font-size: var(--font-normal);
+	font-family: 'Montserrat', sans-serif;
+	/* font-family: 'Open Sans', sans-serif; */
+
+	background-color: var(--secondary);
+	color: var(--primary);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-weight: bold;
+}
+
+h1 {
+	font-size: var(--font-big);
+	@apply text-center;
+}
+
+h2 {
+	font-size: var(--font-large);
+}
+
+button,
+strong {
+	font-weight: bold;
+}
+
+main {
+	@apply flex flex-col;
+	min-height: 100vh;
+}
+
+main.reversed {
+	--primary: var(--whitey);
+	--secondary: var(--black);
+}
+
+p {
+	@apply mt-4 text-justify;
+}
+
+a {
+	text-decoration: underline;
+}
+
+label {
+	@apply flex flex-col;
+}
+
+label strong {
+	font-weigth: 600;
+}
+
+input[type="text"],
+input[type="number"],
+textarea {
+	border: 1px solid var(--primary);
+	width: 100%;
+	@apply p-2;
+}
+
+.form-line {
+	@apply my-2;
+}

@@ -1,0 +1,30 @@
+{
+	"name": "opensea-masslist",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "svelte-kit dev",
+		"build": "svelte-kit build",
+		"preview": "svelte-kit preview",
+		"lint": "prettier --check --plugin-search-dir=. .",
+		"format": "prettier --write --plugin-search-dir=. .",
+		"build-opensea-js": "webpack"
+	},
+	"devDependencies": {
+		"@sveltejs/kit": "next",
+		"autoprefixer": "^10.3.1",
+		"crypto-browserify": "^3.12.0",
+		"cssnano": "^5.0.6",
+		"node-polyfill-webpack-plugin": "^1.1.4",
+		"postcss": "^8.3.5",
+		"postcss-load-config": "^3.1.0",
+		"prettier": "~2.2.1",
+		"prettier-plugin-svelte": "^2.2.0",
+		"svelte": "^3.34.0",
+		"svelte-preprocess": "^4.7.4",
+		"tailwindcss": "^2.2.4",
+		"webpack": "^5.50.0",
+		"webpack-cli": "^4.8.0",
+		"@sveltejs/adapter-static": "^1.0.0-next.15"
+	},
+	"type": "module"
+}
