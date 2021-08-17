@@ -1,12 +1,12 @@
 <script>
+	import env from '$lib/modules/env';
+
 	import { getUserAssetsFromCollection } from '$lib/modules/opensea';
-	import { sleep } from '$lib/modules/utils';
 	import { signerAddress } from '$lib/modules/wallet';
-	import cart from '$lib/stores/cart';
 	import { onDestroy } from 'svelte';
-	import Button from '../Button.svelte';
 	import Loader from '../Loader.svelte';
 	import CollectionItemCard from './CollectionItemCard.svelte';
+	import CollectionStats from './CollectionStats.svelte';
 
 	export let collection;
 
@@ -22,6 +22,8 @@
 
 		if (loading) return;
 		if (!signer) return;
+		if (!collection) return;
+
 		loading = true;
 
 		let hasMore = false;
@@ -55,6 +57,17 @@
 	});
 </script>
 
+<header>
+	<h2>{collection.name}</h2>
+	<em
+		><a href={`${env.VITE_OPENSEA_URL}collection/${collection.slug}`} target="_blank"
+			>see on opensea</a
+		></em
+	>
+	<CollectionStats {collection} />
+</header>
+
+<h2>Your items</h2>
 <div class="items">
 	{#each items as item}
 		<CollectionItemCard {item} />
@@ -68,5 +81,9 @@
 	.items {
 		@apply grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 p-4;
 		padding-bottom: 80px;
+	}
+
+	header {
+		@apply flex flex-col gap-4 items-center;
 	}
 </style>

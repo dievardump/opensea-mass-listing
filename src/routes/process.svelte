@@ -4,6 +4,7 @@
 	import ErrorComponent from '$lib/components/ErrorComponent.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 	import OnlyConnected from '$lib/components/OnlyConnected.svelte';
+	import HorizontalCard from '$lib/components/OpenSea/HorizontalCard.svelte';
 	import { approveOperator, isOperatorApproved } from '$lib/modules/contract';
 	import { signerAddress } from '$lib/modules/wallet';
 
@@ -26,6 +27,11 @@
 	let signing;
 
 	let signCounter = 0;
+
+	let listingType = 'same-pricing';
+
+	let individualPricings = {};
+	let individualExpireHours = {};
 
 	$: getAllInfo($cart);
 
@@ -64,7 +70,6 @@
 		error = null;
 		approving = item;
 
-		console.log(item.asset_contract.address);
 		try {
 			await approveOperator($opensea.proxy, item.asset_contract.address).then((tx) => tx.wait());
 
@@ -78,10 +83,8 @@
 		approving = false;
 	}
 
-	async function signAll() {
+	async function signAllWithSamePricing() {
 		signing = true;
-		const seaport = seaportSDK.getSeaPort();
-		// const amount = ethers.utils.parseEther(price.toString());
 
 		let expirationTime;
 		if (expireHours > 0) {
@@ -91,16 +94,7 @@
 		try {
 			signCounter = 1;
 			for (const item of $cart) {
-				const unsignedOrder = await seaport.createSellOrder({
-					asset: {
-						tokenId: item.token_id,
-						tokenAddress: item.asset_contract.address,
-					},
-					startAmount: price,
-					endAmount: price,
-					accountAddress: $signerAddress,
-					expirationTime,
-				});
+				await doSignOrder(item, price, expirationTime);
 
 				signCounter++;
 			}
@@ -110,6 +104,63 @@
 		}
 
 		signing = false;
+	}
+
+	async function signAllWithIndividualPricing() {
+		for (const item of $cart) {
+			if (
+				isNaN(individualPricings[item.id.toString()]) ||
+				!individualPricings[item.id.toString()]
+			) {
+				if (
+					!confirm(
+						`Price for item ${item.name} is "${
+							individualPricings[item.id.toString()]
+						}" which seems to be invalid. Are you sure to want to continue?`,
+					)
+				) {
+				}
+			}
+		}
+
+		signing = true;
+		try {
+			signCounter = 1;
+			for (const item of $cart) {
+				let expirationTime;
+				if (individualExpireHours[item.id.toString()] > 0) {
+					expirationTime = Math.round(
+						Date.now() / 1000 + 60 * 60 * individualExpireHours[item.id.toString()],
+					);
+				}
+
+				let price = individualPricings[item.id.toString()];
+
+				await doSignOrder(item, price, expirationTime);
+
+				signCounter++;
+			}
+		} catch (e) {
+			console.log(e);
+			error = e;
+		}
+
+		signing = false;
+	}
+
+	async function doSignOrder(item, price, expirationTime) {
+		// console.log(`${item.name} for ${price} eth expiration: ${expirationTime}`);
+
+		return await seaportSDK.getSeaPort().createSellOrder({
+			asset: {
+				tokenId: item.token_id,
+				tokenAddress: item.asset_contract.address,
+			},
+			startAmount: price,
+			endAmount: price,
+			accountAddress: $signerAddress,
+			expirationTime,
+		});
 	}
 
 	onMount(async () => {
@@ -175,39 +226,94 @@
 				<h2>Listing</h2>
 				<p>All items are ready for a "mass listing".</p>
 				<p>you can review and remove items by clicking on the link down right the window.</p>
-				<form on:submit|preventDefault>
+				<h3>Chose your listing type:</h3>
+				<div class="listing-type">
 					<label>
-						<strong>Price per item (in ETH)</strong>
-						<input
-							type="number"
-							bind:value={price}
-							min="0"
-							step="0.01"
-							placeholder="Price you want per item"
-						/>
+						<input type="radio" bind:group={listingType} value="same-pricing" />
+						<span class="radio-fake"> Same price listings </span>
 					</label>
 					<label>
-						<strong>Expiration time in hours (0 == infinite)</strong>
-						<input
-							type="number"
-							bind:value={expireHours}
-							min="0"
-							step="1"
-							placeholder="How many hours for this orders?"
-						/>
+						<input type="radio" bind:group={listingType} value="individual-pricing" />
+						<span class="radio-fake"> Individual price listings </span>
 					</label>
-					<div class="buttons">
-						{#if signing}
-							<Loader />
-							<p>Signing {signCounter} out of {$cart.length} orders</p>
-						{:else}
-							<Button
-								disabled={isNaN(price) || price <= 0 || isNaN(expireHours) || expireHours < 0}
-								on:click={signAll}>Ready to sign {$cart.length} orders</Button
-							>
-						{/if}
-					</div>
-				</form>
+				</div>
+				{#if listingType == 'same-pricing'}
+					<form on:submit|preventDefault>
+						<label>
+							<strong>Price per item (in ETH)</strong>
+							<input
+								type="number"
+								bind:value={price}
+								min="0"
+								step="0.01"
+								placeholder="Price you want per item"
+							/>
+						</label>
+						<label>
+							<strong>Expiration in hours (0 == infinite)</strong>
+							<input
+								type="number"
+								bind:value={expireHours}
+								min="0"
+								step="1"
+								placeholder="How many hours for this orders?"
+							/>
+						</label>
+						<div class="buttons">
+							{#if signing}
+								<Loader />
+								<p>Signing {signCounter} out of {$cart.length} orders</p>
+							{:else}
+								<Button
+									disabled={isNaN(price) || price <= 0 || isNaN(expireHours) || expireHours < 0}
+									on:click={signAllWithSamePricing}>Ready to sign {$cart.length} orders</Button
+								>
+							{/if}
+						</div>
+					</form>
+				{:else if listingType == 'individual-pricing'}
+					<form on:submit|preventDefault>
+						{#each $cart as item}
+							<div class="selected__item">
+								<div class="selected__item__card">
+									<HorizontalCard {item} removable={true} />
+								</div>
+								<div class="selected__item__pricing">
+									<label>
+										<strong>Price (in ETH)</strong>
+										<input
+											type="number"
+											bind:value={individualPricings[item.id.toString()]}
+											min="0"
+											step="0.01"
+											placeholder="Price you want per item"
+										/>
+									</label>
+									<label>
+										<strong>Expiration in hours (0 == infinite)</strong>
+										<input
+											type="number"
+											bind:value={individualExpireHours[item.id.toString()]}
+											min="0"
+											step="1"
+											placeholder="How many hours for this orders?"
+										/>
+									</label>
+								</div>
+							</div>
+						{/each}
+						<div class="buttons">
+							{#if signing}
+								<Loader />
+								<p>Signing {signCounter} out of {$cart.length} orders</p>
+							{:else}
+								<Button on:click={signAllWithIndividualPricing}
+									>Ready to sign {$cart.length} orders</Button
+								>
+							{/if}
+						</div>
+					</form>
+				{/if}
 			{/if}
 		</section>
 	{:else}
@@ -232,12 +338,47 @@
 		width: 32px;
 	}
 
+	.listing-type {
+		@apply flex flex-row py-2;
+	}
+
+	.listing-type input {
+		display: none;
+	}
+
+	.listing-type input + .radio-fake {
+		@apply py-2 px-4;
+		dispaly: block;
+		border: 1px solid var(--primary);
+		cursor: pointer;
+	}
+
+	.listing-type input:checked + .radio-fake {
+		color: var(--secondary);
+		background-color: var(--primary);
+	}
+
 	form {
 		@apply py-4;
-		max-width: 400px;
+		max-width: 600px;
+	}
+
+	form label {
+		font-size: var(--font-small);
 	}
 
 	.buttons {
 		@apply py-2;
+	}
+
+	.selected__item {
+		@apply flex flex-row;
+		@apply py-2;
+		border-top: 1px solid var(--grey);
+	}
+
+	.selected__item__card,
+	.selected__item__card {
+		flex: 0 0 50%;
 	}
 </style>

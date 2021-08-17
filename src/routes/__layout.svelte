@@ -47,7 +47,10 @@
 		padding-left: 320px;
 		width: 100%;
 		min-height: 100%;
+		position: relative;
+		z-index: 0;
 	}
+
 	.main__content {
 		@apply p-4;
 	}

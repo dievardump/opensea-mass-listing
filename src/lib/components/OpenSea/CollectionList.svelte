@@ -6,6 +6,7 @@
 	import collections from '$lib/stores/collections';
 	import { onDestroy } from 'svelte';
 	import Loader from '../Loader.svelte';
+	import CollectionStats from './CollectionStats.svelte';
 
 	export let signer;
 
@@ -73,7 +74,16 @@
 		<ul class:locked>
 			{#each items as collection}
 				<li class:selected={$page.params.slug == collection.slug} on:click={lock}>
-					<a href="/collections/{collection.slug}">{collection.name}</a>
+					<a href="/collections/{collection.slug}"
+						>{collection.name}
+
+						<div class="stats-wrapper">
+							<img src="/images/icons/question-mark.svg" alt="Stats" />
+							<div class="stats-tooltip">
+								<CollectionStats {collection} />
+							</div>
+						</div>
+					</a>
 				</li>
 			{/each}
 		</ul>
@@ -94,6 +104,7 @@
 		background-color: var(--grey);
 		color: var(--light-grey);
 		overflow: auto;
+		z-index: 10;
 	}
 
 	ul {
@@ -103,12 +114,17 @@
 		@apply px-2 py-1;
 		background-color: transparent;
 		transition: all 0.5s;
+		position: relative;
 	}
 
 	li:hover,
 	li.selected {
 		background-color: var(--light-grey);
 		color: var(--grey);
+	}
+
+	li:hover {
+		z-index: 5;
 	}
 
 	a {
@@ -118,5 +134,36 @@
 
 	ul.locked li {
 		pointer-events: none;
+	}
+
+	.stats-wrapper {
+		position: absolute;
+		right: 0.5em;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 14px;
+		height: 14px;
+	}
+
+	.stats-wrapper img {
+		width: 100%;
+		height: auto;
+	}
+
+	.stats-tooltip {
+		display: none;
+		position: absolute;
+		top: calc(100% + 0.5em);
+		right: 0;
+		pointer-events: none;
+	}
+
+	.stats-wrapper:hover {
+	}
+	.stats-wrapper:hover .stats-tooltip {
+		display: block;
+		background-color: var(--whitey);
+		border-radius: 10px;
+		overflow: hidden;
 	}
 </style>

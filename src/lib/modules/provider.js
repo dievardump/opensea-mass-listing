@@ -4,7 +4,6 @@ let provider = null;
 
 export async function connectWallet() {
 	ethereumProvider = window.ethereum;
-	console.log(ethereumProvider);
 	if (!ethereumProvider) {
 		throw new Error('No ethereum provider.');
 	}

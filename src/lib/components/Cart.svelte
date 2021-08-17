@@ -1,20 +1,14 @@
 <script>
 	import { page } from '$app/stores';
+	import env from '$lib/modules/env';
 
 	import cart from '$lib/stores/cart';
 	import Button from './Button.svelte';
+	import HorizontalCard from './OpenSea/HorizontalCard.svelte';
 	import ArrowDown from './SVGs/ArrowDown.svelte';
 	import ArrowUp from './SVGs/ArrowUp.svelte';
 
 	let open;
-
-	async function onCartAction() {}
-
-	function onRemove(item) {
-		const index = $cart.indexOf(item);
-		$cart.splice(index, 1);
-		$cart = $cart;
-	}
 </script>
 
 <section class="cart">
@@ -41,18 +35,7 @@
 {#if open}
 	<section class="quicklist">
 		{#each $cart as item}
-			<div class="quicklist__item">
-				<div class="quicklist__item__image">
-					<img src={item.image_preview_url} alt={item.name} />
-				</div>
-				<div class="quicklist__item__content">
-					<span>{item.collection.name}</span>
-					<strong>{item.name}</strong>
-					<div class="action">
-						<Button on:click={() => onRemove(item)}>Unselect</Button>
-					</div>
-				</div>
-			</div>
+			<HorizontalCard {item} removable={true} />
 		{/each}
 	</section>
 {/if}
