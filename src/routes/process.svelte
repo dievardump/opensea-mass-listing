@@ -31,6 +31,8 @@
 
 	async function getAllInfo() {
 		loading = true;
+
+		notApproved = [];
 		const shouldApprove = [];
 		for (let item of $cart) {
 			const contract = item.asset_contract.address;

@@ -32,8 +32,10 @@ start the dev. you should be able to open `http://localhost:3000` and have the w
 
 will build the app as a static website in `build` you can then copy the content and run it in a docker with nginx or similar.
 
-License:
+# License
 
-Do whatever you want with this, but if you make money, think about giving a bit to your favorites [Gitcoin grants](https://gitcoin.co/grants/).
+Do whatever you want with this, but if you make money, think about:
 
-Open Source & public goods is what makes us have so much fun in this space.
+- giving a bit to your favorites [Gitcoin grants](https://gitcoin.co/grants/). Open Source & public goods is what makes us have so much fun in this space.
+- Taking a look at https://twitter.com/astraglade a very cool generative 3D art project I helped Fabin Rasheed to give live to
+- Taking a look at my friends' PFP project [Cash Grab](https://cashgrab.io/cash-grab) which despite its ironical name is not a cash grab. Roadmap is fire, composable NFTs, 10eth Crypto Puzzle, .... The people behind it are awesome.
