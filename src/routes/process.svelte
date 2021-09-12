@@ -155,6 +155,7 @@
 			asset: {
 				tokenId: item.token_id,
 				tokenAddress: item.asset_contract.address,
+				schemaName: item.asset_contract.schema_name,
 			},
 			startAmount: price,
 			endAmount: price,
