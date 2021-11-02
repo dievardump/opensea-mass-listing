@@ -119,6 +119,7 @@
 						}" which seems to be invalid. Are you sure to want to continue?`,
 					)
 				) {
+					return;
 				}
 			}
 		}
