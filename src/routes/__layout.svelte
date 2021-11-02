@@ -1,12 +1,16 @@
 <script>
+	import { onMount } from 'svelte';
+
+	import '../app.postcss';
+
+	import opensea from '$lib/stores/opensea';
+
+	import Cart from '$lib/components/Cart.svelte';
 	import Header from '$lib/components/Header.svelte';
 	import CollectionList from '$lib/components/OpenSea/CollectionList.svelte';
 
+	import analytics from '$lib/modules/analytics';
 	import { connected, signerAddress } from '$lib/modules/wallet';
-	import Cart from '$lib/components/Cart.svelte';
-
-	import '../app.postcss';
-	import opensea from '$lib/stores/opensea';
 	import { getOpenSeaProxyRegistry } from '$lib/modules/contract';
 
 	// Every user on OpenSea has a proxy that "manage their items for them"
@@ -29,6 +33,12 @@
 			});
 		}
 	}
+
+	onMount(() => {
+		if (import.meta.env.VITE_GOOGLE_ANALYTICS) {
+			analytics(import.meta.env.VITE_GOOGLE_ANALYTICS);
+		}
+	});
 </script>
 
 <CollectionList signer={$signerAddress} />
