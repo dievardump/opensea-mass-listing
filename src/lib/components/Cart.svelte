@@ -13,7 +13,7 @@
 
 <section class="cart">
 	<div />
-	{#if $cart.length > 0 && $page.path !== '/process'}
+	{#if $cart.length > 0 && $page.url.pathname !== '/process'}
 		<Button href="/process">Go to listing process</Button>
 	{/if}
 
